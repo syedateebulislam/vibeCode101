@@ -33,6 +33,22 @@ function App() {
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
+  // Load scoreboard from public/scoreboard.xlsx on mount
+  useEffect(() => {
+    fetch('/scoreboard.xlsx')
+      .then(res => res.arrayBuffer())
+      .then(data => {
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        setScoreboard(json);
+        if (json.length > 0) {
+          const best = json.reduce((a, b) => (a.score > b.score ? a : b), json[0]);
+          setTopScorer(best);
+        }
+      })
+      .catch(() => {});
+  }, []);
   // Download scoreboard as Excel
   const handleDownloadScoreboard = () => {
     const ws = XLSX.utils.json_to_sheet(scoreboard);
@@ -174,20 +190,41 @@ function App() {
     setRunning(false);
     window._tetrisPauseGame && window._tetrisPauseGame();
   };
+
+  // Reset button handler
+  const handleReset = () => {
+    setRunning(false);
+    setPaused(false);
+    setTimer(300);
+    setHandle('');
+    window._tetrisPauseGame && window._tetrisPauseGame();
+    // Clear the canvas
+    const canvas = document.getElementById('tetris-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    document.getElementById('tetris-score').textContent = 0;
+  };
   const handleGameOver = (reason) => {
     setRunning(false);
     setPaused(false);
     const score = parseInt(document.getElementById('tetris-score').textContent, 10);
     const entry = { handle, score, reason, time: new Date().toLocaleTimeString() };
     setScoreboard(prev => {
-      const updated = [entry, ...prev.slice(0, 9)];
+      const updated = [entry, ...prev];
       // Update top scorer if needed
       const best = updated.reduce((a, b) => (a.score > b.score ? a : b), updated[0]);
       setTopScorer(best);
+      // Save to Excel for download (user must commit to repo)
+      const ws = XLSX.utils.json_to_sheet(updated);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Scoreboard');
+      XLSX.writeFile(wb, 'scoreboard.xlsx');
       return updated;
     });
     setTimer(300);
-    alert(reason + ' Final Score: ' + score + '\nHandle: ' + handle);
+    alert(reason + ' Final Score: ' + score + '\nHandle: ' + handle + '\n\nDownload the new scoreboard.xlsx and commit it to the repo to update the database.');
   };
   const handleScoreUpdate = (score) => {
     // Optionally update live score elsewhere
@@ -234,6 +271,7 @@ function App() {
       <div style={{ margin: '20px auto', width: canvasSize.width, display: 'flex', justifyContent: 'center', gap: 16 }}>
         <button onClick={handleStart} disabled={running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#61dafb', border: 'none', borderRadius: 4, cursor: running ? 'not-allowed' : 'pointer' }}>Start</button>
         <button onClick={handlePause} disabled={!running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#f538ff', color: '#fff', border: 'none', borderRadius: 4, cursor: !running ? 'not-allowed' : 'pointer' }}>Pause</button>
+        <button onClick={handleReset} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#222', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Reset</button>
       </div>
       <div style={{ color: '#888', marginTop: 20 }}>
         Controls: <b>←</b> Left, <b>→</b> Right, <b>↓</b> Fast Down, <b>↑</b> Rotate
