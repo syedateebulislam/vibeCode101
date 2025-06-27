@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import './App.css';
+import Tetris from './Components/Tetris';
 
 // Random handle generator
 function randomHandle() {
@@ -33,6 +34,7 @@ function App() {
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
+  const [gameOverMsg, setGameOverMsg] = useState(null);
   // Load scoreboard from localStorage or public/scoreboard.xlsx on mount
   useEffect(() => {
     const local = localStorage.getItem('tetris_scoreboard');
@@ -73,7 +75,6 @@ function App() {
   const [handle, setHandle] = useState('');
   const [topScorer, setTopScorer] = useState(null);
   const timerRef = useRef();
-  const tetrisRef = useRef(null);
 
   useEffect(() => {
     function handleResize() {
@@ -83,82 +84,7 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    import('./tetris.js').then(() => {
-      window._tetrisPause = false;
-      window._tetrisRunning = false;
-      window._tetrisStart = (onGameOver, onScore) => {
-        window._tetrisPause = false;
-        window._tetrisRunning = true;
-        window.startTetris('tetris-canvas', 'tetris-score', onGameOver, onScore, timerRef, TETRIS_COLS * canvasSize.block, TETRIS_ROWS * canvasSize.block);
-      };
-      window._tetrisPauseGame = () => {
-        window._tetrisPause = true;
-        window._tetrisRunning = false;
-      };
-      // Touch controls for mobile (call Tetris movement functions directly)
-      setTimeout(() => {
-        const canvas = document.getElementById('tetris-canvas');
-        if (!canvas) return;
-        let startX = 0, startY = 0, moved = false;
-        const moveLeft = () => window._tetrisMove && window._tetrisMove(-1);
-        const moveRight = () => window._tetrisMove && window._tetrisMove(1);
-        const drop = () => window._tetrisDrop && window._tetrisDrop();
-        const rotate = () => window._tetrisRotate && window._tetrisRotate();
-        const handleTouchStart = (e) => {
-          if (!window._tetrisRunning) return;
-          if (e.touches.length === 1) {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            moved = false;
-          }
-        };
-        const handleTouchMove = (e) => {
-          if (!window._tetrisRunning) return;
-          if (e.touches.length === 1) {
-            const dx = e.touches[0].clientX - startX;
-            const dy = e.touches[0].clientY - startY;
-            if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
-              if (dx > 0) {
-                moveRight();
-              } else {
-                moveLeft();
-              }
-              moved = true;
-              startX = e.touches[0].clientX;
-              startY = e.touches[0].clientY;
-            } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-              if (dy > 0) {
-                drop();
-              }
-              moved = true;
-              startX = e.touches[0].clientX;
-              startY = e.touches[0].clientY;
-            }
-          }
-        };
-        const handleTouchEnd = (e) => {
-          if (!window._tetrisRunning) return;
-          if (!moved) {
-            rotate();
-          }
-          moved = false;
-        };
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-        // Clean up
-        window._tetrisTouchCleanup = () => {
-          canvas.removeEventListener('touchstart', handleTouchStart);
-          canvas.removeEventListener('touchmove', handleTouchMove);
-          canvas.removeEventListener('touchend', handleTouchEnd);
-        };
-      }, 100);
-    });
-    return () => {
-      if (window._tetrisTouchCleanup) window._tetrisTouchCleanup();
-    };
-  }, [canvasSize]);
+  // Tetris logic is now handled in the Tetris React component
 
   useEffect(() => {
     if (running && timer > 0) {
@@ -175,33 +101,23 @@ function App() {
     setRunning(true);
     setPaused(false);
     setTimer(300);
-    window._tetrisStart && window._tetrisStart(handleGameOver, handleScoreUpdate);
+    setGameOverMsg(null);
   };
   const handlePause = () => {
     setPaused(true);
     setRunning(false);
-    window._tetrisPauseGame && window._tetrisPauseGame();
   };
-
-  // Reset button handler
   const handleReset = () => {
     setRunning(false);
     setPaused(false);
     setTimer(300);
     setHandle('');
-    window._tetrisPauseGame && window._tetrisPauseGame();
-    // Clear the canvas
-    const canvas = document.getElementById('tetris-canvas');
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    document.getElementById('tetris-score').textContent = 0;
+    setGameOverMsg(null);
   };
-  const handleGameOver = (reason) => {
+  const handleGameOver = (reason, score = 0) => {
     setRunning(false);
     setPaused(false);
-    const score = parseInt(document.getElementById('tetris-score').textContent, 10);
+    setGameOverMsg(`${reason} Final Score: ${score} | Handle: ${handle}`);
     const entry = { handle, score, reason, time: new Date().toLocaleTimeString() };
     setScoreboard(prev => {
       const updated = [entry, ...prev];
@@ -213,7 +129,6 @@ function App() {
       return updated;
     });
     setTimer(300);
-    alert(reason + ' Final Score: ' + score + '\nHandle: ' + handle + '\n\nDownload the new scoreboard.xlsx and commit it to the repo to update the database.');
   };
   const handleScoreUpdate = (score) => {
     // Optionally update live score elsewhere
@@ -221,7 +136,7 @@ function App() {
 
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
-      <h1>Tetris Game (Vanilla JS)</h1>
+      <h1>Vibe Coded Tetris Game</h1>
       <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -236,15 +151,40 @@ function App() {
           <div>Time Left</div>
           <div>{Math.floor(timer/60)}:{('0'+(timer%60)).slice(-2)}</div>
         </div>
-        {/* Game Canvas (center) */}
-        <div>
-          <canvas ref={tetrisRef} id="tetris-canvas" width={TETRIS_COLS * canvasSize.block} height={TETRIS_ROWS * canvasSize.block} style={{ background: '#111', display: 'block', margin: '0 auto', borderRadius: 8, width: '100%', maxWidth: TETRIS_COLS * canvasSize.block, height: 'auto', touchAction: 'none' }}></canvas>
-          <div style={{ marginTop: 10, fontSize: 18, color: '#61dafb' }}>
-            Score: <span id="tetris-score">0</span>
-          </div>
-          <div style={{ marginTop: 10, fontSize: 16, color: '#aaa' }}>
-            Handle: <b>{handle}</b>
-          </div>
+        {/* Game Board (center) */}
+        <div style={{ position: 'relative' }}>
+          <Tetris
+            running={running}
+            paused={paused}
+            onGameOver={(reason, score) => handleGameOver(reason, score)}
+            onScore={handleScoreUpdate}
+            blockSize={canvasSize.block}
+            width={canvasSize.width}
+            height={canvasSize.height}
+            handle={handle}
+            timer={timer}
+            setTimer={setTimer}
+            setRunning={setRunning}
+            setPaused={setPaused}
+          />
+          {gameOverMsg && (
+            <div style={{
+              position: 'absolute',
+              top: '40%',
+              left: 0,
+              width: '100%',
+              color: '#fff',
+              fontSize: 22,
+              fontWeight: 'bold',
+              textAlign: 'center',
+              background: 'rgba(0,0,0,0.85)',
+              padding: 24,
+              borderRadius: 12,
+              zIndex: 10,
+              boxShadow: '0 0 16px #000a',
+              pointerEvents: 'none',
+            }}>{gameOverMsg}</div>
+          )}
         </div>
         {/* Top Scorer (right) */}
         <div style={{ minWidth: 120, textAlign: 'left', color: '#ffe138', fontSize: 18, fontWeight: 'bold', marginTop: 40 }}>
