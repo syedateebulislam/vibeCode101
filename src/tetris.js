@@ -61,12 +61,13 @@ function collide(board, piece) {
       if (piece.shape[r][c]) {
         let newRow = piece.row + r;
         let newCol = piece.col + c;
+        // Only check collision if the cell is within the board
         if (
           newRow < 0 ||
-          newRow >= TETRIS_ROWS ||
+          newRow > TETRIS_ROWS - 1 ||
           newCol < 0 ||
-          newCol >= TETRIS_COLS ||
-          board[newRow][newCol]
+          newCol > TETRIS_COLS - 1 ||
+          board[newRow] && board[newRow][newCol]
         ) {
           return true;
         }
