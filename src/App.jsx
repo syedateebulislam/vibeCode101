@@ -40,7 +40,14 @@ function App() {
       .then(data => {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
+        let json = XLSX.utils.sheet_to_json(sheet);
+        // Normalize handle column (case-insensitive)
+        json = json.map(row => {
+          if (!row.handle && (row.Handle || row.HANDLE)) {
+            row.handle = row.Handle || row.HANDLE;
+          }
+          return row;
+        });
         setScoreboard(json);
         if (json.length > 0) {
           const best = json.reduce((a, b) => (a.score > b.score ? a : b), json[0]);
