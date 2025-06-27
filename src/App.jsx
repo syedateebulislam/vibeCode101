@@ -54,66 +54,68 @@ function App() {
         window._tetrisPause = true;
         window._tetrisRunning = false;
       };
+      // Touch controls for mobile (call Tetris movement functions directly)
+      setTimeout(() => {
+        const canvas = document.getElementById('tetris-canvas');
+        if (!canvas) return;
+        let startX = 0, startY = 0, moved = false;
+        const moveLeft = () => window._tetrisMove && window._tetrisMove(-1);
+        const moveRight = () => window._tetrisMove && window._tetrisMove(1);
+        const drop = () => window._tetrisDrop && window._tetrisDrop();
+        const rotate = () => window._tetrisRotate && window._tetrisRotate();
+        const handleTouchStart = (e) => {
+          if (!window._tetrisRunning) return;
+          if (e.touches.length === 1) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            moved = false;
+          }
+        };
+        const handleTouchMove = (e) => {
+          if (!window._tetrisRunning) return;
+          if (e.touches.length === 1) {
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
+              if (dx > 0) {
+                moveRight();
+              } else {
+                moveLeft();
+              }
+              moved = true;
+              startX = e.touches[0].clientX;
+              startY = e.touches[0].clientY;
+            } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
+              if (dy > 0) {
+                drop();
+              }
+              moved = true;
+              startX = e.touches[0].clientX;
+              startY = e.touches[0].clientY;
+            }
+          }
+        };
+        const handleTouchEnd = (e) => {
+          if (!window._tetrisRunning) return;
+          if (!moved) {
+            rotate();
+          }
+          moved = false;
+        };
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        // Clean up
+        window._tetrisTouchCleanup = () => {
+          canvas.removeEventListener('touchstart', handleTouchStart);
+          canvas.removeEventListener('touchmove', handleTouchMove);
+          canvas.removeEventListener('touchend', handleTouchEnd);
+        };
+      }, 100);
     });
-
-    // Touch controls for mobile
-    const canvas = document.getElementById('tetris-canvas');
-    if (!canvas) return;
-    let startX = 0, startY = 0, moved = false;
-    const handleTouchStart = (e) => {
-      if (!window._tetrisRunning) return;
-      if (e.touches.length === 1) {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        moved = false;
-      }
-    };
-    const handleTouchMove = (e) => {
-      if (!window._tetrisRunning) return;
-      if (e.touches.length === 1) {
-        const dx = e.touches[0].clientX - startX;
-        const dy = e.touches[0].clientY - startY;
-        if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
-          if (dx > 0) {
-            // Swipe right
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
-          } else {
-            // Swipe left
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-          }
-          moved = true;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-          if (dy > 0) {
-            // Swipe down
-            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
-          }
-          moved = true;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        }
-      }
-    };
-    const handleTouchEnd = (e) => {
-      if (!window._tetrisRunning) return;
-      if (!moved) {
-        // Tap = rotate
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
-      }
-      moved = false;
-      // Release fast drop if needed
-      document.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown' }));
-    };
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
     return () => {
-      canvas.removeEventListener('touchstart', handleTouchStart);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', handleTouchEnd);
+      if (window._tetrisTouchCleanup) window._tetrisTouchCleanup();
     };
-  }, [canvasSize]);
 
   useEffect(() => {
     if (running && timer > 0) {

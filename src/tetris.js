@@ -106,10 +106,14 @@ function rotate(piece) {
   return { ...piece, shape: newShape };
 }
 
+
 window._tetrisPause = false;
 window._tetrisRunning = false;
 window._tetrisStart = null;
 window._tetrisPauseGame = null;
+window._tetrisMove = null;
+window._tetrisDrop = null;
+window._tetrisRotate = null;
 
 window.startTetris = function(canvasId, scoreId, onGameOver, onScore, timerRef, canvasWidth, canvasHeight) {
   const canvas = document.getElementById(canvasId);
@@ -182,6 +186,7 @@ window.startTetris = function(canvasId, scoreId, onGameOver, onScore, timerRef, 
       drawPiece(ctx, piece);
     }
   }
+  window._tetrisMove = move;
 
   function drop() {
     let moved = { ...piece, row: piece.row + 1 };
@@ -191,6 +196,7 @@ window.startTetris = function(canvasId, scoreId, onGameOver, onScore, timerRef, 
       drawPiece(ctx, piece);
     }
   }
+  window._tetrisDrop = drop;
 
   function rotatePiece() {
     let rotated = rotate(piece);
@@ -200,6 +206,7 @@ window.startTetris = function(canvasId, scoreId, onGameOver, onScore, timerRef, 
       drawPiece(ctx, piece);
     }
   }
+  window._tetrisRotate = rotatePiece;
 
   document.onkeydown = function(e) {
     if (gameOver || window._tetrisPause) return;
