@@ -33,8 +33,20 @@ function App() {
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
-  // Load scoreboard from public/scoreboard.xlsx on mount
+  // Load scoreboard from localStorage or public/scoreboard.xlsx on mount
   useEffect(() => {
+    const local = localStorage.getItem('tetris_scoreboard');
+    if (local) {
+      try {
+        const json = JSON.parse(local);
+        setScoreboard(json);
+        if (json.length > 0) {
+          const best = json.reduce((a, b) => (a.score > b.score ? a : b), json[0]);
+          setTopScorer(best);
+        }
+        return;
+      } catch {}
+    }
     fetch('/scoreboard.xlsx')
       .then(res => res.arrayBuffer())
       .then(data => {
@@ -196,7 +208,8 @@ function App() {
       // Update top scorer if needed
       const best = updated.reduce((a, b) => (a.score > b.score ? a : b), updated[0]);
       setTopScorer(best);
-      // (No download, just update in memory)
+      // Persist to localStorage
+      localStorage.setItem('tetris_scoreboard', JSON.stringify(updated));
       return updated;
     });
     setTimer(300);
