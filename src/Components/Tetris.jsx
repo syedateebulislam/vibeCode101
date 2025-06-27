@@ -80,6 +80,9 @@ function clearLines(board) {
 
 const getInitialBoard = () => Array.from({ length: TETRIS_ROWS }, () => Array(TETRIS_COLS).fill(0));
 
+// Animation duration for line clear (ms)
+const LINE_CLEAR_ANIMATION = 300;
+
 export default function Tetris({
   running,
   paused,
@@ -95,7 +98,9 @@ export default function Tetris({
   setPaused
 }) {
   const [board, setBoard] = useState(getInitialBoard());
+  const [clearingRows, setClearingRows] = useState([]);
   const [piece, setPiece] = useState(randomPiece());
+  const [nextPiece, setNextPiece] = useState(randomPiece());
   const [score, setScore] = useState(0);
   const [interval, setIntervalState] = useState(400);
   const [dropCount, setDropCount] = useState(0);
@@ -144,7 +149,7 @@ export default function Tetris({
     // eslint-disable-next-line
   }, [running, paused, gameOver, piece]);
 
-  // Touch controls (swipe/tap)
+  // Touch controls (swipe/tap, tap on block to rotate only)
   useEffect(() => {
     if (!running || paused || gameOver) return;
     let startX = 0, startY = 0, moved = false;
@@ -174,7 +179,25 @@ export default function Tetris({
       }
     };
     const handleTouchEnd = (e) => {
-      if (!moved) rotatePiece();
+      if (!moved && e.changedTouches && e.changedTouches.length === 1) {
+        // Only rotate if tap was on a block of the current piece
+        const touch = e.changedTouches[0];
+        const boardDiv = document.getElementById('tetris-board');
+        if (boardDiv) {
+          const rect = boardDiv.getBoundingClientRect();
+          const x = touch.clientX - rect.left;
+          const y = touch.clientY - rect.top;
+          const col = Math.floor(x / (rect.width / TETRIS_COLS));
+          const row = Math.floor(y / (rect.height / TETRIS_ROWS));
+          if (
+            row >= piece.row && row < piece.row + piece.shape.length &&
+            col >= piece.col && col < piece.col + piece.shape[0].length &&
+            piece.shape[row - piece.row][col - piece.col]
+          ) {
+            rotatePiece();
+          }
+        }
+      }
       moved = false;
     };
     const boardDiv = document.getElementById('tetris-board');
@@ -190,7 +213,6 @@ export default function Tetris({
         boardDiv.removeEventListener('touchend', handleTouchEnd);
       }
     };
-    // eslint-disable-next-line
   }, [running, paused, gameOver, piece]);
 
   // Reset on new game
@@ -198,6 +220,7 @@ export default function Tetris({
     if (!running) {
       setBoard(getInitialBoard());
       setPiece(randomPiece());
+      setNextPiece(randomPiece());
       setScore(0);
       setIntervalState(400);
       setDropCount(0);
@@ -205,7 +228,7 @@ export default function Tetris({
     }
   }, [running]);
 
-  // Drop piece
+  // Drop piece with line clear animation
   const drop = useCallback(() => {
     if (gameOver || paused) return;
     const moved = { ...piece, row: piece.row + 1 };
@@ -213,27 +236,54 @@ export default function Tetris({
       setPiece(moved);
     } else {
       const merged = merge(board, piece);
-      const { newBoard, lines } = clearLines(merged);
-      let newScore = score + lines * 100;
-      setScore(newScore);
-      onScore && onScore(newScore);
-      const newDropCount = dropCount + 1;
-      setDropCount(newDropCount);
-      // Reset interval to normal speed after piece lands
-      setIntervalState(Math.max(100, 400 - newDropCount * 8));
-      setFastDropping(false);
-      const nextPiece = randomPiece();
-      if (collide(newBoard, nextPiece)) {
-        setGameOver(true);
-        setRunning(false);
-        onGameOver && onGameOver('Game Over!', newScore);
-        return;
+      // Find which rows will be cleared
+      const rowsToClear = [];
+      for (let r = 0; r < merged.length; r++) {
+        if (merged[r].every(cell => cell !== 0)) rowsToClear.push(r);
       }
-      setBoard(newBoard);
-      setPiece(nextPiece);
+      if (rowsToClear.length > 0) {
+        setClearingRows(rowsToClear);
+        setTimeout(() => {
+          const { newBoard, lines } = clearLines(merged);
+          let newScore = score + lines * 100;
+          setScore(newScore);
+          onScore && onScore(newScore);
+          const newDropCount = dropCount + 1;
+          setDropCount(newDropCount);
+          setIntervalState(Math.max(100, 400 - newDropCount * 8));
+          setFastDropping(false);
+          setClearingRows([]);
+          if (collide(newBoard, nextPiece)) {
+            setGameOver(true);
+            setRunning(false);
+            onGameOver && onGameOver('Game Over!', newScore);
+            return;
+          }
+          setBoard(newBoard);
+          setPiece(nextPiece);
+          setNextPiece(randomPiece());
+        }, LINE_CLEAR_ANIMATION);
+      } else {
+        // No lines to clear, normal drop
+        let newScore = score;
+        onScore && onScore(newScore);
+        const newDropCount = dropCount + 1;
+        setDropCount(newDropCount);
+        setIntervalState(Math.max(100, 400 - newDropCount * 8));
+        setFastDropping(false);
+        if (collide(merged, nextPiece)) {
+          setGameOver(true);
+          setRunning(false);
+          onGameOver && onGameOver('Game Over!', newScore);
+          return;
+        }
+        setBoard(merged);
+        setPiece(nextPiece);
+        setNextPiece(randomPiece());
+      }
     }
     // eslint-disable-next-line
-  }, [board, piece, gameOver, paused, score, dropCount, onScore, setRunning, onGameOver]);
+  }, [board, piece, gameOver, paused, score, dropCount, onScore, setRunning, onGameOver, nextPiece]);
 
   // Move left/right
   const move = useCallback((dir) => {
@@ -283,68 +333,125 @@ export default function Tetris({
   };
 
   return (
-    <div id="tetris-board" style={{
-      width,
-      height,
-      background: '#111',
-      display: 'grid',
-      gridTemplateRows: `repeat(${TETRIS_ROWS}, 1fr)`,
-      gridTemplateColumns: `repeat(${TETRIS_COLS}, 1fr)`,
-      borderRadius: 8,
-      touchAction: 'none',
-      position: 'relative',
-      margin: '0 auto',
-      boxShadow: '0 0 12px #0008',
-      overflow: 'hidden',
-      maxWidth: '100%'
-    }}>
-      {renderBoard().map((row, r) =>
-        row.map((cell, c) => (
-          <div key={r + '-' + c} style={{
-            width: blockSize,
-            height: blockSize,
-            background: cell ? COLORS[cell] : 'transparent',
-            border: cell ? '1px solid #222' : '1px solid #2222',
-            boxSizing: 'border-box',
-            borderRadius: 4,
-            transition: 'background 0.1s',
-          }} />
-        ))
-      )}
-      {/* Score overlay */}
+    <div style={{ position: 'relative', width, margin: '0 auto' }}>
+      {/* Next piece preview */}
       <div style={{
         position: 'absolute',
-        top: 8,
-        left: 8,
-        color: '#61dafb',
-        fontWeight: 'bold',
-        fontSize: 18,
-        textShadow: '1px 1px 2px #000a',
-        pointerEvents: 'none',
-      }}>Score: {score}</div>
-      <div style={{
-        position: 'absolute',
-        top: 36,
-        left: 8,
-        color: '#aaa',
-        fontSize: 16,
-        pointerEvents: 'none',
-      }}>Handle: <b>{handle}</b></div>
-      {gameOver && (
+        top: -blockSize * 3,
+        left: 0,
+        width: blockSize * 6,
+        height: blockSize * 3,
+        background: 'rgba(30,30,30,0.95)',
+        borderRadius: 8,
+        boxShadow: '0 2px 8px #0006',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 5,
+        margin: '0 auto',
+        left: '50%',
+        transform: 'translateX(-50%)',
+      }}>
+        <div style={{ color: '#ffe138', fontWeight: 'bold', fontSize: 14, marginBottom: 2 }}>Next</div>
+        <div style={{ display: 'grid', gridTemplateRows: `repeat(4, ${blockSize - 4}px)`, gridTemplateColumns: `repeat(4, ${blockSize - 4}px)`, gap: 2 }}>
+          {[0,1,2,3].map(r =>
+            [0,1,2,3].map(c => (
+              <div key={r + '-' + c} style={{
+                width: blockSize - 4,
+                height: blockSize - 4,
+                background: nextPiece.shape[r] && nextPiece.shape[r][c] ? COLORS[nextPiece.type] : 'transparent',
+                border: nextPiece.shape[r] && nextPiece.shape[r][c] ? '1px solid #222' : '1px solid #2222',
+                borderRadius: 3,
+                boxSizing: 'border-box',
+                transition: 'background 0.1s',
+              }} />
+            ))
+          }
+        </div>
+      </div>
+      <div id="tetris-board" style={{
+        width,
+        height,
+        background: '#111',
+        display: 'grid',
+        gridTemplateRows: `repeat(${TETRIS_ROWS}, 1fr)`,
+        gridTemplateColumns: `repeat(${TETRIS_COLS}, 1fr)`,
+        borderRadius: 8,
+        touchAction: 'none',
+        position: 'relative',
+        margin: '0 auto',
+        boxShadow: '0 0 12px #0008',
+        overflow: 'hidden',
+        maxWidth: '100%'
+      }}>
+        {renderBoard().map((row, r) =>
+          row.map((cell, c) => {
+            const isClearing = clearingRows.includes(r);
+            // Animate dropping blocks (new piece) and pop on placement
+            let classNames = [];
+            if (isClearing) classNames.push('tetris-clearing');
+            // Animate new piece drop
+            if (piece && piece.row <= r && piece.col <= c && piece.col + piece.shape[0].length > c && piece.row + piece.shape.length > r && piece.shape[r - piece.row] && piece.shape[r - piece.row][c - piece.col]) {
+              classNames.push('tetris-drop');
+            }
+            // Animate pop for placed blocks (not moving piece)
+            if (!isClearing && cell && (!piece || r < piece.row || r >= piece.row + piece.shape.length || c < piece.col || c >= piece.col + piece.shape[0].length)) {
+              classNames.push('tetris-pop');
+            }
+            return (
+              <div
+                key={r + '-' + c}
+                className={classNames.join(' ')}
+                style={{
+                  width: blockSize,
+                  height: blockSize,
+                  background: cell ? COLORS[cell] : 'transparent',
+                  border: cell ? '1px solid #222' : '1px solid #2222',
+                  boxSizing: 'border-box',
+                  borderRadius: 4,
+                  transition: 'background 0.1s',
+                  animation: isClearing ? `tetrisFlash ${LINE_CLEAR_ANIMATION}ms` : undefined,
+                }}
+              />
+            );
+          })
+        )}
+        {/* Score overlay */}
         <div style={{
           position: 'absolute',
-          top: '40%',
-          left: 0,
-          width: '100%',
-          color: '#fff',
-          fontSize: 32,
+          top: 8,
+          left: 8,
+          color: '#61dafb',
           fontWeight: 'bold',
-          textAlign: 'center',
-          background: '#000a',
-          padding: 16,
-          borderRadius: 8,
-        }}>Game Over!</div>
-      )}
+          fontSize: 18,
+          textShadow: '1px 1px 2px #000a',
+          pointerEvents: 'none',
+        }}>Score: {score}</div>
+        <div style={{
+          position: 'absolute',
+          top: 36,
+          left: 8,
+          color: '#aaa',
+          fontSize: 16,
+          pointerEvents: 'none',
+        }}>Handle: <b>{handle}</b></div>
+        {gameOver && (
+          <div style={{
+            position: 'absolute',
+            top: '40%',
+            left: 0,
+            width: '100%',
+            color: '#fff',
+            fontSize: 32,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            background: '#000a',
+            padding: 16,
+            borderRadius: 8,
+          }}>Game Over!</div>
+        )}
+      </div>
     </div>
   );
 }
