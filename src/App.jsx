@@ -189,11 +189,7 @@ function App() {
       // Update top scorer if needed
       const best = updated.reduce((a, b) => (a.score > b.score ? a : b), updated[0]);
       setTopScorer(best);
-      // Save to Excel for download (user must commit to repo)
-      const ws = XLSX.utils.json_to_sheet(updated);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Scoreboard');
-      XLSX.writeFile(wb, 'scoreboard.xlsx');
+      // (No download, just update in memory)
       return updated;
     });
     setTimer(300);
