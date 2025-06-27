@@ -244,7 +244,7 @@ function App() {
       <div style={{ margin: '20px auto', width: canvasSize.width, display: 'flex', justifyContent: 'center', gap: 16 }}>
         <button onClick={handleStart} disabled={running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#61dafb', border: 'none', borderRadius: 4, cursor: running ? 'not-allowed' : 'pointer' }}>Start</button>
         <button onClick={handlePause} disabled={!running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#f538ff', color: '#fff', border: 'none', borderRadius: 4, cursor: !running ? 'not-allowed' : 'pointer' }}>Pause</button>
-        <button onClick={handleReset} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#222', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Reset</button>
+        <button onClick={handleReset} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#ffe138', color: '#222', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Reset</button>
       </div>
       <div style={{ color: '#888', marginTop: 20 }}>
         Controls: <b>←</b> Left, <b>→</b> Right, <b>↓</b> Fast Down, <b>↑</b> Rotate
