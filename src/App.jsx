@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
+import * as XLSX from 'xlsx';
 import './App.css';
 
 // Random handle generator
@@ -32,6 +33,33 @@ function App() {
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
+  // Download scoreboard as Excel
+  const handleDownloadScoreboard = () => {
+    const ws = XLSX.utils.json_to_sheet(scoreboard);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Scoreboard');
+    XLSX.writeFile(wb, 'tetris_scoreboard.xlsx');
+  };
+
+  // Upload scoreboard from Excel
+  const handleUploadScoreboard = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+      setScoreboard(json);
+      // Update top scorer
+      if (json.length > 0) {
+        const best = json.reduce((a, b) => (a.score > b.score ? a : b), json[0]);
+        setTopScorer(best);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
   const [timer, setTimer] = useState(300); // 5 minutes
   const [canvasSize, setCanvasSize] = useState(getCanvasSize());
   const [handle, setHandle] = useState('');
@@ -212,6 +240,13 @@ function App() {
       </div>
       <div style={{ margin: '40px auto', maxWidth: 500 }}>
         <h2>Scoreboard</h2>
+        <div style={{ marginBottom: 12 }}>
+          <button onClick={handleDownloadScoreboard} style={{ marginRight: 8, padding: '6px 16px', borderRadius: 4, border: 'none', background: '#ffe138', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>Download Excel</button>
+          <label style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 4, background: '#61dafb', color: '#222', fontWeight: 'bold', cursor: 'pointer' }}>
+            Upload Excel
+            <input type="file" accept=".xlsx,.xls" onChange={handleUploadScoreboard} style={{ display: 'none' }} />
+          </label>
+        </div>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#222', color: '#fff', borderRadius: 8 }}>
           <thead>
             <tr style={{ background: '#444' }}>
