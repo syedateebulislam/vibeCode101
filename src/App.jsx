@@ -13,12 +13,18 @@ function randomHandle() {
   );
 }
 
+
+// Always use TETRIS_COLS * BLOCK_SIZE and TETRIS_ROWS * BLOCK_SIZE for canvas
+const TETRIS_COLS = 10;
+const TETRIS_ROWS = 20;
+const BLOCK_SIZE = 30;
 function getCanvasSize() {
-  const min = Math.min(window.innerWidth, window.innerHeight);
-  // Keep aspect ratio 1:2 (width:height)
-  let width = Math.max(200, Math.floor(min * 0.5));
-  let height = width * 2;
-  return { width, height };
+  // Fit to screen but keep exact block grid
+  let maxWidth = Math.min(window.innerWidth, 0.9 * window.innerHeight / 2, 320);
+  let block = Math.floor(maxWidth / TETRIS_COLS);
+  let width = block * TETRIS_COLS;
+  let height = block * TETRIS_ROWS;
+  return { width, height, block };
 }
 
 
@@ -48,7 +54,7 @@ function App() {
       window._tetrisStart = (onGameOver, onScore) => {
         window._tetrisPause = false;
         window._tetrisRunning = true;
-        window.startTetris('tetris-canvas', 'tetris-score', onGameOver, onScore, timerRef, canvasSize.width, canvasSize.height);
+        window.startTetris('tetris-canvas', 'tetris-score', onGameOver, onScore, timerRef, TETRIS_COLS * canvasSize.block, TETRIS_ROWS * canvasSize.block);
       };
       window._tetrisPauseGame = () => {
         window._tetrisPause = true;
@@ -177,7 +183,7 @@ function App() {
         </div>
         {/* Game Canvas (center) */}
         <div>
-          <canvas ref={tetrisRef} id="tetris-canvas" width={canvasSize.width} height={canvasSize.height} style={{ background: '#111', display: 'block', margin: '0 auto', borderRadius: 8, maxWidth: '100vw', maxHeight: '80vh', touchAction: 'none' }}></canvas>
+          <canvas ref={tetrisRef} id="tetris-canvas" width={TETRIS_COLS * canvasSize.block} height={TETRIS_ROWS * canvasSize.block} style={{ background: '#111', display: 'block', margin: '0 auto', borderRadius: 8, width: '100%', maxWidth: TETRIS_COLS * canvasSize.block, height: 'auto', touchAction: 'none' }}></canvas>
           <div style={{ marginTop: 10, fontSize: 18, color: '#61dafb' }}>
             Score: <span id="tetris-score">0</span>
           </div>
