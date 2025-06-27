@@ -122,6 +122,7 @@ function App() {
     return () => {
       if (window._tetrisTouchCleanup) window._tetrisTouchCleanup();
     };
+  }, [canvasSize]);
 
   useEffect(() => {
     if (running && timer > 0) {
