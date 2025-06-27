@@ -334,42 +334,6 @@ export default function Tetris({
 
   return (
     <div style={{ position: 'relative', width, margin: '0 auto' }}>
-      {/* Next piece preview */}
-      <div style={{
-        position: 'absolute',
-        top: -blockSize * 3,
-        left: 0,
-        width: blockSize * 6,
-        height: blockSize * 3,
-        background: 'rgba(30,30,30,0.95)',
-        borderRadius: 8,
-        boxShadow: '0 2px 8px #0006',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 5,
-        margin: '0 auto',
-        left: '50%',
-        transform: 'translateX(-50%)',
-      }}>
-        <div style={{ color: '#ffe138', fontWeight: 'bold', fontSize: 14, marginBottom: 2 }}>Next</div>
-        <div style={{ display: 'grid', gridTemplateRows: `repeat(4, ${blockSize - 4}px)`, gridTemplateColumns: `repeat(4, ${blockSize - 4}px)`, gap: 2 }}>
-          {[0,1,2,3].map(r =>
-            [0,1,2,3].map(c => (
-              <div key={r + '-' + c} style={{
-                width: blockSize - 4,
-                height: blockSize - 4,
-                background: nextPiece.shape[r] && nextPiece.shape[r][c] ? COLORS[nextPiece.type] : 'transparent',
-                border: nextPiece.shape[r] && nextPiece.shape[r][c] ? '1px solid #222' : '1px solid #2222',
-                borderRadius: 3,
-                boxSizing: 'border-box',
-                transition: 'background 0.1s',
-              }} />
-            ))
-          }
-        </div>
-      </div>
       <div id="tetris-board" style={{
         width,
         height,
@@ -385,6 +349,40 @@ export default function Tetris({
         overflow: 'hidden',
         maxWidth: '100%'
       }}>
+        {/* Next piece preview INSIDE board, smaller size */}
+        <div style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          width: (blockSize * 2.2) + 8,
+          height: (blockSize * 2.2) + 24,
+          background: 'rgba(30,30,30,0.92)',
+          borderRadius: 8,
+          boxShadow: '0 2px 8px #0006',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          zIndex: 10,
+          padding: 3,
+        }}>
+          <div style={{ color: '#ffe138', fontWeight: 'bold', fontSize: 12, marginBottom: 1 }}>Next</div>
+          <div style={{ display: 'grid', gridTemplateRows: `repeat(4, ${(blockSize/2.2)-2}px)`, gridTemplateColumns: `repeat(4, ${(blockSize/2.2)-2}px)`, gap: 1 }}>
+            {[0,1,2,3].map(r =>
+              [0,1,2,3].map(c => (
+                <div key={r + '-' + c} style={{
+                  width: (blockSize/2.2)-2,
+                  height: (blockSize/2.2)-2,
+                  background: nextPiece.shape[r] && nextPiece.shape[r][c] ? COLORS[nextPiece.type] : 'transparent',
+                  border: nextPiece.shape[r] && nextPiece.shape[r][c] ? '1px solid #222' : '1px solid #2222',
+                  borderRadius: 2,
+                  boxSizing: 'border-box',
+                  transition: 'background 0.1s',
+                }} />
+              ))
+            )}
+          </div>
+        </div>
         {renderBoard().map((row, r) =>
           row.map((cell, c) => {
             const isClearing = clearingRows.includes(r);
