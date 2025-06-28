@@ -105,8 +105,13 @@ function App() {
     setTimer(300);
     setGameOverMsg(null);
   };
-  const handlePause = () => {
-    setPaused(true);
+  const handlePauseResume = () => {
+    if (paused) {
+      setPaused(false);
+      setRunning(true);
+    } else {
+      setPaused(true);
+    }
   };
   const handleReset = () => {
     setRunning(false);
@@ -245,7 +250,21 @@ function App() {
       </div>
       <div style={{ margin: '20px auto', width: canvasSize.width, display: 'flex', justifyContent: 'center', gap: 16 }}>
         <button onClick={handleStart} disabled={running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#61dafb', border: 'none', borderRadius: 4, cursor: running ? 'not-allowed' : 'pointer' }}>Start</button>
-        <button onClick={handlePause} disabled={!running} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#f538ff', color: '#fff', border: 'none', borderRadius: 4, cursor: !running ? 'not-allowed' : 'pointer' }}>Pause</button>
+        <button
+          onClick={handlePauseResume}
+          disabled={!running && !paused}
+          style={{
+            padding: '8px 24px',
+            fontWeight: 'bold',
+            background: paused ? '#61dafb' : '#f538ff',
+            color: paused ? '#222' : '#fff',
+            border: 'none',
+            borderRadius: 4,
+            cursor: (!running && !paused) ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {paused ? 'Resume' : 'Pause'}
+        </button>
         <button onClick={handleReset} style={{ padding: '8px 24px', fontWeight: 'bold', background: '#ffe138', color: '#222', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Reset</button>
       </div>
       <div style={{ color: '#888', marginTop: 20 }}>
