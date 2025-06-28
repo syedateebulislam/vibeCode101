@@ -141,8 +141,50 @@ function App() {
   }
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
+      {/* Animated Home/Menu Button */}
+      <button
+        onClick={() => setShowTetris(false)}
+        style={{
+          position: 'absolute',
+          top: 18,
+          left: 18,
+          zIndex: 100,
+          background: 'linear-gradient(135deg, #ffe138 0%, #f538ff 100%)',
+          border: 'none',
+          borderRadius: '50%',
+          width: 54,
+          height: 54,
+          boxShadow: '0 2px 12px #0006',
+          cursor: 'pointer',
+          outline: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          animation: 'menuPulse 1.2s infinite alternate',
+          fontSize: 28,
+          fontWeight: 'bold',
+          color: '#fff',
+          transition: 'transform 0.15s',
+        }}
+        title="Back to Home"
+      >
+        <span style={{
+          display: 'inline-block',
+          transform: 'rotate(-90deg)',
+          fontSize: 32,
+          fontWeight: 900,
+          letterSpacing: -2,
+        }}>☰</span>
+      </button>
       <h1>Vibe Coded Tetris Game</h1>
       <div style={{
+/* Add this to App.css for menuPulse animation */
+/*
+@keyframes menuPulse {
+  0% { box-shadow: 0 2px 12px #0006, 0 0 0 0 #ffe13888; }
+  100% { box-shadow: 0 2px 24px #000a, 0 0 0 12px #ffe13822; }
+}
+*/
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
