@@ -171,11 +171,11 @@ function App() {
         }}
         title="Back to Home"
       >
-        {/* Hut icon SVG */}
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
-          <path d="M3 12L12 5l9 7" />
-          <rect x="7" y="13" width="10" height="7" rx="2" fill="currentColor" stroke="currentColor" />
-          <path d="M9 21V16h6v5" fill="none" stroke="#fff" strokeWidth="1.5" />
+        {/* Hut icon SVG - always visible */}
+        <svg width="28" height="28" viewBox="0 0 24 24" style={{ display: 'block' }}>
+          <path d="M3 12L12 5l9 7" stroke="#222" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <rect x="7" y="13" width="10" height="7" rx="2" fill="#fff" stroke="#222" strokeWidth="2.2" />
+          <path d="M9 21V16h6v5" fill="none" stroke="#222" strokeWidth="1.5" />
         </svg>
       </button>
       <h1>Vibe Coded Tetris Game</h1>
