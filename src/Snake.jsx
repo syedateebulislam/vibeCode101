@@ -144,19 +144,18 @@ export default function Snake({ onHome }) {
       <h1>Snake Game</h1>
       <div style={{
         display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        gap: 32,
+        flexDirection: 'column',
+        alignItems: 'center',
         margin: '20px auto',
         width: '100%',
         maxWidth: 480
       }}>
-        {/* Score (left) */}
-        <div style={{ minWidth: 100, textAlign: 'right', color: '#f538ff', fontSize: 22, fontWeight: 'bold', marginTop: 40 }}>
+        {/* Score (top, centered) */}
+        <div style={{ textAlign: 'center', color: '#f538ff', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
           <div>Score</div>
           <div>{score}</div>
         </div>
-        {/* Game Board (center) */}
+        {/* Game Board (centered) */}
         <div style={{ position: 'relative', background: '#111', borderRadius: 8, boxShadow: '0 0 12px #0008', overflow: 'hidden', width: 400, height: 400, display: 'grid', gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`, gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)` }}>
           {[...Array(GRID_SIZE)].map((_, y) =>
             [...Array(GRID_SIZE)].map((_, x) => {
