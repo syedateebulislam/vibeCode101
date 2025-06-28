@@ -107,7 +107,6 @@ function App() {
   };
   const handlePause = () => {
     setPaused(true);
-    setRunning(false);
   };
   const handleReset = () => {
     setRunning(false);
