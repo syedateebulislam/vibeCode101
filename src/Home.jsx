@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-export default function Home({ onSelectTetris, onSelectSnake }) {
+export default function Home({ onSelectTetris, onSelectSnake, onSelectMemory, onSelectColoring }) {
   return (
     <div style={{
       minHeight: '100vh',
@@ -63,6 +63,52 @@ export default function Home({ onSelectTetris, onSelectSnake }) {
         >
           <span role="img" aria-label="snake" style={{ fontSize: 48, marginBottom: 12 }}>🐍</span>
           Snake
+        </div>
+        <div
+          onClick={onSelectMemory}
+          style={{
+            width: 180,
+            height: 180,
+            background: 'linear-gradient(135deg, #8ac926 0%, #ffca3a 100%)',
+            borderRadius: 18,
+            boxShadow: '0 4px 24px #0006',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.15s',
+            fontWeight: 'bold',
+            fontSize: 28,
+            color: '#222',
+            border: '4px solid #1982c4',
+          }}
+        >
+          <span role="img" aria-label="memory" style={{ fontSize: 48, marginBottom: 12 }}>🧠</span>
+          Memory Match
+        </div>
+        <div
+          onClick={onSelectColoring}
+          style={{
+            width: 180,
+            height: 180,
+            background: 'linear-gradient(135deg, #ff595e 0%, #6a4c93 100%)',
+            borderRadius: 18,
+            boxShadow: '0 4px 24px #0006',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.15s',
+            fontWeight: 'bold',
+            fontSize: 28,
+            color: '#fff',
+            border: '4px solid #fff',
+          }}
+        >
+          <span role="img" aria-label="coloring" style={{ fontSize: 48, marginBottom: 12 }}>🎨</span>
+          Coloring Book
         </div>
       </div>
       <div style={{ color: '#aaa', marginTop: 40, fontSize: 16 }}>

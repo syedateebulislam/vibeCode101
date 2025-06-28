@@ -16,7 +16,10 @@ function getRandomFood(snake) {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE),
     };
-  } while (snake.some(seg => seg.x === food.x && seg.y === food.y));
+  } while (
+    snake.some(seg => seg.x === food.x && seg.y === food.y) ||
+    food.x < 0 || food.x >= GRID_SIZE || food.y < 0 || food.y >= GRID_SIZE
+  );
   return food;
 }
 

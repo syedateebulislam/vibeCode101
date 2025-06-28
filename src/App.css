@@ -73,3 +73,75 @@
   0% { box-shadow: 0 2px 12px #0006, 0 0 0 0 #ffe13888; }
   100% { box-shadow: 0 2px 24px #000a, 0 0 0 12px #ffe13822; }
 }
+
+/* Memory Match styles */
+.memory-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  justify-content: center;
+  margin: 16px 0 24px 0;
+}
+.memory-card {
+  width: 60px;
+  height: 60px;
+  font-size: 2.7rem;
+  background: #fff;
+  border: 2px solid #61dafb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.18s;
+  box-shadow: 0 2px 8px #0002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  will-change: transform;
+  text-shadow: 0 2px 0 #fff, 0 0 2px #000, 0 4px 8px #ffe13888;
+}
+.memory-card.flipped {
+  animation: cardFlip 0.4s;
+  background: #fff;
+  border-color: #f538ff;
+  z-index: 2;
+}
+.memory-card.just-matched {
+  animation: cardMatch 0.7s, cardPop 0.3s;
+  background: #8ac926 !important;
+  border-color: #8ac926 !important;
+}
+.memory-card.just-flipped {
+  animation: cardPop 0.3s;
+}
+.win-message {
+  color: #1982c4;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+/* Coloring Book styles */
+.game-container {
+  background: #fff8;
+  border-radius: 16px;
+  padding: 24px 16px 32px 16px;
+  margin: 32px auto;
+  max-width: 420px;
+  box-shadow: 0 4px 24px #0002;
+}
+
+/* Memory Match animations */
+@keyframes cardFlip {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+@keyframes cardPop {
+  0% { transform: scale(1); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes cardMatch {
+  0% { background: #ffe138; }
+  50% { background: #8ac926; }
+  100% { background: #ffe138; }
+}

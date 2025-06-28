@@ -4,6 +4,8 @@ import './App.css';
 import Tetris from './Components/Tetris';
 import Home from './Home';
 import Snake from './Snake';
+import MemoryMatch from './MemoryMatch';
+import ColoringBook from './ColoringBook';
 
 // Random handle generator
 function randomHandle() {
@@ -34,6 +36,8 @@ function getCanvasSize() {
 function App() {
   const [showTetris, setShowTetris] = useState(false);
   const [showSnake, setShowSnake] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
+  const [showColoring, setShowColoring] = useState(false);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
@@ -141,11 +145,22 @@ function App() {
     // Optionally update live score elsewhere
   };
 
-  if (!showTetris && !showSnake) {
-    return <Home onSelectTetris={() => { setShowTetris(true); setShowSnake(false); }} onSelectSnake={() => { setShowSnake(true); setShowTetris(false); }} />;
+  if (!showTetris && !showSnake && !showMemory && !showColoring) {
+    return <Home
+      onSelectTetris={() => { setShowTetris(true); setShowSnake(false); setShowMemory(false); setShowColoring(false); }}
+      onSelectSnake={() => { setShowSnake(true); setShowTetris(false); setShowMemory(false); setShowColoring(false); }}
+      onSelectMemory={() => { setShowMemory(true); setShowTetris(false); setShowSnake(false); setShowColoring(false); }}
+      onSelectColoring={() => { setShowColoring(true); setShowTetris(false); setShowSnake(false); setShowMemory(false); }}
+    />;
   }
   if (showSnake) {
-    return <Snake onHome={() => { setShowSnake(false); setShowTetris(false); }} />;
+    return <Snake onHome={() => { setShowSnake(false); setShowTetris(false); setShowMemory(false); setShowColoring(false); }} />;
+  }
+  if (showMemory) {
+    return <MemoryMatch onHome={() => { setShowMemory(false); setShowTetris(false); setShowSnake(false); setShowColoring(false); }} />;
+  }
+  if (showColoring) {
+    return <ColoringBook onHome={() => { setShowColoring(false); setShowTetris(false); setShowSnake(false); setShowMemory(false); }} />;
   }
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
