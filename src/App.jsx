@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import './App.css';
 import Tetris from './Components/Tetris';
+import Home from './Home';
 
 // Random handle generator
 function randomHandle() {
@@ -31,6 +32,7 @@ function getCanvasSize() {
 
 
 function App() {
+  const [showTetris, setShowTetris] = useState(false);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
@@ -134,6 +136,9 @@ function App() {
     // Optionally update live score elsewhere
   };
 
+  if (!showTetris) {
+    return <Home onSelectTetris={() => setShowTetris(true)} />;
+  }
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
       <h1>Vibe Coded Tetris Game</h1>
