@@ -331,6 +331,30 @@ export default function Tetris({
         }
       }
     }
+
+    // Add ghost piece (dotted outline)
+    // Find the lowest position the piece can go
+    let ghostRow = piece.row;
+    while (true) {
+      const testPiece = { ...piece, row: ghostRow + 1 };
+      if (collide(board, testPiece)) break;
+      ghostRow++;
+    }
+    // Mark ghost cells with a special value (e.g., 99)
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[r].length; c++) {
+        if (piece.shape[r][c]) {
+          const row = ghostRow + r;
+          const col = piece.col + c;
+          if (row >= 0 && row < TETRIS_ROWS && col >= 0 && col < TETRIS_COLS) {
+            // Only mark if not already occupied by the falling piece
+            if (display[row][col] === 0) {
+              display[row][col] = 99;
+            }
+          }
+        }
+      }
+    }
     return display;
   };
 
@@ -401,6 +425,23 @@ export default function Tetris({
             }
             // If clearing, use a single color for all blocks in the row
             const clearingColor = '#fff'; // or any highlight color you want
+            // Ghost piece style
+            if (cell === 99) {
+              return (
+                <div
+                  key={r + '-' + c}
+                  style={{
+                    width: blockSize,
+                    height: blockSize,
+                    background: 'transparent',
+                    border: '2px dotted #00eaff',
+                    boxSizing: 'border-box',
+                    borderRadius: 4,
+                    opacity: 0.7,
+                  }}
+                />
+              );
+            }
             return (
               <div
                 key={r + '-' + c}
