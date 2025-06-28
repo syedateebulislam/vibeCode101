@@ -1,9 +1,9 @@
-
 import { useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 import './App.css';
 import Tetris from './Components/Tetris';
 import Home from './Home';
+import Snake from './Snake';
 
 // Random handle generator
 function randomHandle() {
@@ -33,6 +33,7 @@ function getCanvasSize() {
 
 function App() {
   const [showTetris, setShowTetris] = useState(false);
+  const [showSnake, setShowSnake] = useState(false);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [scoreboard, setScoreboard] = useState([]);
@@ -140,8 +141,11 @@ function App() {
     // Optionally update live score elsewhere
   };
 
-  if (!showTetris) {
-    return <Home onSelectTetris={() => setShowTetris(true)} />;
+  if (!showTetris && !showSnake) {
+    return <Home onSelectTetris={() => { setShowTetris(true); setShowSnake(false); }} onSelectSnake={() => { setShowSnake(true); setShowTetris(false); }} />;
+  }
+  if (showSnake) {
+    return <Snake onHome={() => { setShowSnake(false); setShowTetris(false); }} />;
   }
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
