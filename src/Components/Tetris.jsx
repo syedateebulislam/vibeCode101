@@ -397,6 +397,8 @@ export default function Tetris({
             if (!isClearing && cell && (!piece || r < piece.row || r >= piece.row + piece.shape.length || c < piece.col || c >= piece.col + piece.shape[0].length)) {
               classNames.push('tetris-pop');
             }
+            // If clearing, use a single color for all blocks in the row
+            const clearingColor = '#fff'; // or any highlight color you want
             return (
               <div
                 key={r + '-' + c}
@@ -404,7 +406,7 @@ export default function Tetris({
                 style={{
                   width: blockSize,
                   height: blockSize,
-                  background: cell ? COLORS[cell] : 'transparent',
+                  background: isClearing && cell ? clearingColor : (cell ? COLORS[cell] : 'transparent'),
                   border: cell ? '1px solid #222' : '1px solid #2222',
                   boxSizing: 'border-box',
                   borderRadius: 4,
