@@ -164,7 +164,6 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          animation: 'menuPulse 1.2s infinite alternate',
           fontSize: 28,
           fontWeight: 'bold',
           color: '#fff',
@@ -172,13 +171,12 @@ function App() {
         }}
         title="Back to Home"
       >
-        <span style={{
-          display: 'inline-block',
-          transform: 'rotate(-90deg)',
-          fontSize: 32,
-          fontWeight: 900,
-          letterSpacing: -2,
-        }}>☰</span>
+        {/* Home icon SVG */}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+          <path d="M3 12L12 4l9 8" />
+          <path d="M9 21V12h6v9" />
+          <path d="M21 21H3" />
+        </svg>
       </button>
       <h1>Vibe Coded Tetris Game</h1>
       <div style={{
