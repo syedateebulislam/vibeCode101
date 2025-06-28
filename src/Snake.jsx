@@ -30,9 +30,20 @@ export default function Snake({ onHome }) {
   const [gameOver, setGameOver] = useState(false);
   const [scoreboard, setScoreboard] = useState(() => JSON.parse(localStorage.getItem('snake_scoreboard')||'[]'));
   const [showScoreMsg, setShowScoreMsg] = useState(null);
+  const [handle, setHandle] = useState('');
   const moveRef = useRef();
   const dirRef = useRef(dir);
   dirRef.current = dir;
+
+  const randomHandle = () => {
+    const animals = ['Tiger', 'Wolf', 'Falcon', 'Shark', 'Panther', 'Eagle', 'Viper', 'Rhino', 'Dragon', 'Cobra'];
+    const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Silver', 'Golden', 'Crimson', 'Shadow', 'Neon'];
+    return (
+      colors[Math.floor(Math.random() * colors.length)] +
+      animals[Math.floor(Math.random() * animals.length)] +
+      Math.floor(100 + Math.random() * 900)
+    );
+  };
 
   useEffect(() => {
     if (!running || paused || gameOver) return;
@@ -45,8 +56,8 @@ export default function Snake({ onHome }) {
           prev.some(seg => seg.x === next.x && seg.y === next.y)
         ) {
           setGameOver(true);
-          setShowScoreMsg(`Game Over! Score: ${score}`);
-          const entry = { score, time: new Date().toLocaleTimeString() };
+          setShowScoreMsg(`Game Over! Score: ${score} | Handle: ${handle}`);
+          const entry = { handle, score, time: new Date().toLocaleTimeString() };
           const updated = [entry, ...scoreboard].slice(0, 10);
           setScoreboard(updated);
           localStorage.setItem('snake_scoreboard', JSON.stringify(updated));
@@ -64,7 +75,7 @@ export default function Snake({ onHome }) {
       });
     }, SPEED);
     return () => clearInterval(moveRef.current);
-  }, [running, paused, gameOver, food, score, scoreboard]);
+  }, [running, paused, gameOver, food, score, scoreboard, handle]);
 
   useEffect(() => {
     const handleKey = e => {
@@ -85,6 +96,7 @@ export default function Snake({ onHome }) {
     setScore(0);
     setGameOver(false);
     setShowScoreMsg(null);
+    setHandle(randomHandle());
     setRunning(true);
     setPaused(false);
   };
@@ -154,6 +166,7 @@ export default function Snake({ onHome }) {
         <div style={{ textAlign: 'center', color: '#f538ff', fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
           <div>Score</div>
           <div>{score}</div>
+          <div style={{ color: '#ffe138', fontSize: 16, marginTop: 2 }}>Handle: <b>{handle}</b></div>
         </div>
         {/* Game Board (centered) */}
         <div style={{ position: 'relative', background: '#111', borderRadius: 8, boxShadow: '0 0 12px #0008', overflow: 'hidden', width: 400, height: 400, display: 'grid', gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`, gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)` }}>
@@ -222,6 +235,7 @@ export default function Snake({ onHome }) {
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#222', color: '#fff', borderRadius: 8 }}>
           <thead>
             <tr style={{ background: '#444' }}>
+              <th style={{ padding: 6 }}>Handle</th>
               <th style={{ padding: 6 }}>Score</th>
               <th style={{ padding: 6 }}>Time</th>
             </tr>
@@ -229,6 +243,7 @@ export default function Snake({ onHome }) {
           <tbody>
             {scoreboard.map((entry, i) => (
               <tr key={i} style={{ background: i % 2 ? '#333' : '#222' }}>
+                <td style={{ padding: 6 }}>{entry.handle}</td>
                 <td style={{ padding: 6 }}>{entry.score}</td>
                 <td style={{ padding: 6 }}>{entry.time}</td>
               </tr>
