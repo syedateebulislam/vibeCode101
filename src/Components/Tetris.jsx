@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 const TETRIS_ROWS = 20;
 const TETRIS_COLS = 10;
+// All blocks will use the same color
+const BLOCK_COLOR = '#00eaff'; // Choose any color you like
 const COLORS = [
-  '', '#FF0D72', '#0DC2FF', '#0DFF72', '#F538FF', '#FF8E0D', '#FFE138', '#3877FF'
+  '', BLOCK_COLOR, BLOCK_COLOR, BLOCK_COLOR, BLOCK_COLOR, BLOCK_COLOR, BLOCK_COLOR, BLOCK_COLOR
 ];
 const SHAPES = [
   [],
