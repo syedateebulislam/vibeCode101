@@ -322,7 +322,7 @@ function App() {
           </tbody>
         </table>
       </div>
-      <Analytics />
+      {/* <Analytics /> */}
     </div>
   );
 }
