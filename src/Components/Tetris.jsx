@@ -495,6 +495,132 @@ export default function Tetris({
           }}>Game Over!</div>
         )}
       </div>
+      
+      {/* Touch Control Buttons */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 16,
+        marginTop: 16,
+        padding: '0 20px',
+        flexWrap: 'wrap'
+      }}>
+        <button
+          onTouchStart={() => move(-1)}
+          onClick={() => move(-1)}
+          disabled={!running || paused || gameOver}
+          style={{
+            width: 50,
+            height: 50,
+            fontSize: 24,
+            background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+            border: 'none',
+            borderRadius: 8,
+            color: '#fff',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: (!running || paused || gameOver) ? 0.5 : 1,
+            transition: 'all 0.1s',
+            userSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
+          }}
+          title="Move Left"
+        >
+          ⬅️
+        </button>
+        
+        <button
+          onTouchStart={() => rotatePiece()}
+          onClick={() => rotatePiece()}
+          disabled={!running || paused || gameOver}
+          style={{
+            width: 50,
+            height: 50,
+            fontSize: 24,
+            background: 'linear-gradient(135deg, #ffe138 0%, #f9c74f 100%)',
+            border: 'none',
+            borderRadius: 8,
+            color: '#222',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: (!running || paused || gameOver) ? 0.5 : 1,
+            transition: 'all 0.1s',
+            userSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
+          }}
+          title="Rotate"
+        >
+          🔄
+        </button>
+        
+        <button
+          onTouchStart={() => setFastDropping(true)}
+          onTouchEnd={() => setFastDropping(false)}
+          onMouseDown={() => setFastDropping(true)}
+          onMouseUp={() => setFastDropping(false)}
+          onMouseLeave={() => setFastDropping(false)}
+          disabled={!running || paused || gameOver}
+          style={{
+            width: 50,
+            height: 50,
+            fontSize: 24,
+            background: 'linear-gradient(135deg, #f538ff 0%, #d63384 100%)',
+            border: 'none',
+            borderRadius: 8,
+            color: '#fff',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: (!running || paused || gameOver) ? 0.5 : 1,
+            transition: 'all 0.1s',
+            userSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
+          }}
+          title="Fast Drop"
+        >
+          ⬇️
+        </button>
+        
+        <button
+          onTouchStart={() => move(1)}
+          onClick={() => move(1)}
+          disabled={!running || paused || gameOver}
+          style={{
+            width: 50,
+            height: 50,
+            fontSize: 24,
+            background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+            border: 'none',
+            borderRadius: 8,
+            color: '#fff',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: (!running || paused || gameOver) ? 0.5 : 1,
+            transition: 'all 0.1s',
+            userSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none'
+          }}
+          title="Move Right"
+        >
+          ➡️
+        </button>
+      </div>
     </div>
   );
 }

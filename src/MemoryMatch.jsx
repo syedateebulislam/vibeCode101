@@ -19,6 +19,7 @@ export default function MemoryMatch({ onHome }) {
   const [justFlipped, setJustFlipped] = useState(null);
   const [moves, setMoves] = useState(0);
   const [won, setWon] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(0);
 
   useEffect(() => {
     if (matched.length === cards.length) setWon(true);
@@ -54,7 +55,29 @@ export default function MemoryMatch({ onHome }) {
     setWon(false);
     setJustMatched([]);
     setJustFlipped(null);
+    setSelectedCard(0);
   }
+
+  // Navigation functions
+  const moveLeft = () => {
+    setSelectedCard(prev => prev > 0 ? prev - 1 : cards.length - 1);
+  };
+  
+  const moveRight = () => {
+    setSelectedCard(prev => prev < cards.length - 1 ? prev + 1 : 0);
+  };
+  
+  const moveUp = () => {
+    setSelectedCard(prev => prev >= 4 ? prev - 4 : prev + 12);
+  };
+  
+  const moveDown = () => {
+    setSelectedCard(prev => prev < 12 ? prev + 4 : prev - 12);
+  };
+  
+  const flipSelected = () => {
+    handleFlip(selectedCard);
+  };
 
   return (
     <div className="game-container" style={{position:'relative', minHeight: 420, paddingTop: 0}}>
@@ -83,11 +106,7 @@ export default function MemoryMatch({ onHome }) {
         }}
         title="Back to Home"
       >
-        <svg width="32" height="32" viewBox="0 0 24 24" style={{ display: 'block' }}>
-          <path d="M3 12L12 5l9 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <rect x="7" y="13" width="10" height="7" rx="2" fill="#222" stroke="#fff" strokeWidth="2.5" />
-          <path d="M9 21V16h6v5" fill="none" stroke="#fff" strokeWidth="2" />
-        </svg>
+        🏠
       </button>
       <h2>Memory Match</h2>
       <div style={{marginBottom:8}}>Moves: {moves}</div>
@@ -99,10 +118,15 @@ export default function MemoryMatch({ onHome }) {
               `memory-card` +
               (flipped.includes(idx)||matched.includes(idx)?' flipped':'') +
               (justMatched.includes(idx)?' just-matched':'') +
-              (justFlipped===idx?' just-flipped':'')
+              (justFlipped===idx?' just-flipped':'') +
+              (selectedCard===idx?' selected':'')
             }
             onClick={() => handleFlip(idx)}
             disabled={flipped.includes(idx)||matched.includes(idx)}
+            style={{
+              border: selectedCard === idx ? '3px solid #ffe138' : undefined,
+              boxShadow: selectedCard === idx ? '0 0 12px #ffe138' : undefined
+            }}
           >
             {flipped.includes(idx)||matched.includes(idx)? sym : '❓'}
           </button>
@@ -110,6 +134,154 @@ export default function MemoryMatch({ onHome }) {
       </div>
       {won && <div className="win-message">🎉 You won! <button onClick={reset}>Play Again</button></div>}
       {!won && <button onClick={reset} style={{marginTop:16}}>Restart</button>}
+      
+      {/* Touch Control Buttons */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 20,
+        padding: '0 20px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onTouchStart={moveUp}
+            onClick={moveUp}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Up"
+          >
+            ⬆️
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+          <button
+            onTouchStart={moveLeft}
+            onClick={moveLeft}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Left"
+          >
+            ⬅️
+          </button>
+          
+          <button
+            onTouchStart={flipSelected}
+            onClick={flipSelected}
+            disabled={flipped.includes(selectedCard)||matched.includes(selectedCard)}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 20,
+              background: 'linear-gradient(135deg, #ffe138 0%, #f9c74f 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#222',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (flipped.includes(selectedCard)||matched.includes(selectedCard)) ? 0.5 : 1,
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Flip Card"
+          >
+            🔄
+          </button>
+          
+          <button
+            onTouchStart={moveRight}
+            onClick={moveRight}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Right"
+          >
+            ➡️
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onTouchStart={moveDown}
+            onClick={moveDown}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Down"
+          >
+            ⬇️
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

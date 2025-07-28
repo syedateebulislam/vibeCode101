@@ -6,6 +6,7 @@ import Home from './Home';
 import Snake from './Snake';
 import MemoryMatch from './MemoryMatch';
 import ColoringBook from './ColoringBook';
+import { Analytics } from "@vercel/analytics/react"
 
 // Random handle generator
 function randomHandle() {
@@ -146,21 +147,41 @@ function App() {
   };
 
   if (!showTetris && !showSnake && !showMemory && !showColoring) {
-    return <Home
-      onSelectTetris={() => { setShowTetris(true); setShowSnake(false); setShowMemory(false); setShowColoring(false); }}
-      onSelectSnake={() => { setShowSnake(true); setShowTetris(false); setShowMemory(false); setShowColoring(false); }}
-      onSelectMemory={() => { setShowMemory(true); setShowTetris(false); setShowSnake(false); setShowColoring(false); }}
-      onSelectColoring={() => { setShowColoring(true); setShowTetris(false); setShowSnake(false); setShowMemory(false); }}
-    />;
+    return (
+      <>
+        <Home
+          onSelectTetris={() => { setShowTetris(true); setShowSnake(false); setShowMemory(false); setShowColoring(false); }}
+          onSelectSnake={() => { setShowSnake(true); setShowTetris(false); setShowMemory(false); setShowColoring(false); }}
+          onSelectMemory={() => { setShowMemory(true); setShowTetris(false); setShowSnake(false); setShowColoring(false); }}
+          onSelectColoring={() => { setShowColoring(true); setShowTetris(false); setShowSnake(false); setShowMemory(false); }}
+        />
+        <Analytics />
+      </>
+    );
   }
   if (showSnake) {
-    return <Snake onHome={() => { setShowSnake(false); setShowTetris(false); setShowMemory(false); setShowColoring(false); }} />;
+    return (
+      <>
+        <Snake onHome={() => { setShowSnake(false); setShowTetris(false); setShowMemory(false); setShowColoring(false); }} />
+        <Analytics />
+      </>
+    );
   }
   if (showMemory) {
-    return <MemoryMatch onHome={() => { setShowMemory(false); setShowTetris(false); setShowSnake(false); setShowColoring(false); }} />;
+    return (
+      <>
+        <MemoryMatch onHome={() => { setShowMemory(false); setShowTetris(false); setShowSnake(false); setShowColoring(false); }} />
+        <Analytics />
+      </>
+    );
   }
   if (showColoring) {
-    return <ColoringBook onHome={() => { setShowColoring(false); setShowTetris(false); setShowSnake(false); setShowMemory(false); }} />;
+    return (
+      <>
+        <ColoringBook onHome={() => { setShowColoring(false); setShowTetris(false); setShowSnake(false); setShowMemory(false); }} />
+        <Analytics />
+      </>
+    );
   }
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
@@ -191,21 +212,10 @@ function App() {
         title="Back to Home"
       >
         {/* Hut icon SVG - high contrast */}
-        <svg width="32" height="32" viewBox="0 0 24 24" style={{ display: 'block' }}>
-          <path d="M3 12L12 5l9 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <rect x="7" y="13" width="10" height="7" rx="2" fill="#222" stroke="#fff" strokeWidth="2.5" />
-          <path d="M9 21V16h6v5" fill="none" stroke="#fff" strokeWidth="2" />
-        </svg>
+        🏠
       </button>
       <h1>Vibe Coded Tetris Game</h1>
       <div style={{
-/* Add this to App.css for menuPulse animation */
-/*
-@keyframes menuPulse {
-  0% { box-shadow: 0 2px 12px #0006, 0 0 0 0 #ffe13888; }
-  100% { box-shadow: 0 2px 24px #000a, 0 0 0 12px #ffe13822; }
-}
-*/
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
@@ -310,6 +320,7 @@ function App() {
           </tbody>
         </table>
       </div>
+      <Analytics />
     </div>
   );
 }

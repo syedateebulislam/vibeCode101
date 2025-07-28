@@ -74,6 +74,8 @@ const palette = [
 export default function ColoringBook({ onHome }) {
   const [color, setColor] = useState('#ff595e');
   const [fills, setFills] = useState(Array(shapes.length).fill('#fff'));
+  const [selectedShape, setSelectedShape] = useState(0);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
 
   function fillShape(idx, e) {
     // Only fill if click is inside the SVG drawing area
@@ -83,7 +85,34 @@ export default function ColoringBook({ onHome }) {
 
   function reset() {
     setFills(Array(shapes.length).fill('#fff'));
+    setSelectedShape(0);
+    setSelectedColorIndex(0);
   }
+
+  // Navigation functions
+  const nextColor = () => {
+    const newIndex = (selectedColorIndex + 1) % palette.length;
+    setSelectedColorIndex(newIndex);
+    setColor(palette[newIndex]);
+  };
+  
+  const prevColor = () => {
+    const newIndex = selectedColorIndex === 0 ? palette.length - 1 : selectedColorIndex - 1;
+    setSelectedColorIndex(newIndex);
+    setColor(palette[newIndex]);
+  };
+  
+  const nextShape = () => {
+    setSelectedShape((selectedShape + 1) % shapes.length);
+  };
+  
+  const prevShape = () => {
+    setSelectedShape(selectedShape === 0 ? shapes.length - 1 : selectedShape - 1);
+  };
+  
+  const fillSelectedShape = () => {
+    fillShape(selectedShape);
+  };
 
   return (
     <div className="game-container" style={{position:'relative', maxWidth: 480, margin: '32px auto', boxSizing: 'border-box'}}>
@@ -128,23 +157,198 @@ export default function ColoringBook({ onHome }) {
         }}
         title="Back to Home"
       >
-        <svg width="32" height="32" viewBox="0 0 24 24" style={{ display: 'block' }}>
-          <path d="M3 12L12 5l9 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <rect x="7" y="13" width="10" height="7" rx="2" fill="#222" stroke="#fff" strokeWidth="2.5" />
-          <path d="M9 21V16h6v5" fill="none" stroke="#fff" strokeWidth="2" />
-        </svg>
+        🏠
       </button>
       <div style={{display:'flex',gap:24,justifyContent:'center',flexWrap:'wrap'}}>
         {shapes.map((shape, idx) => (
           <div key={shape.name} style={{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:24}}>
-            <svg width={200} height={240} style={{background:'#eee',borderRadius:24,cursor:'pointer',boxShadow:'0 4px 16px #0001'}} onClick={(e)=>fillShape(idx, e)}>
+            <svg 
+              width={200} 
+              height={240} 
+              style={{
+                background:'#eee',
+                borderRadius:24,
+                cursor:'pointer',
+                boxShadow: selectedShape === idx ? '0 0 16px #ffe138' : '0 4px 16px #0001',
+                border: selectedShape === idx ? '3px solid #ffe138' : 'none'
+              }} 
+              onClick={(e)=>fillShape(idx, e)}
+            >
               {React.cloneElement(shape.svg, { fill: fills[idx] })}
             </svg>
-            <div style={{marginTop:8,fontWeight:'bold',fontSize:18,color:'#333'}}>{shape.name}</div>
+            <div style={{marginTop:8,fontWeight:'bold',fontSize:18,color: selectedShape === idx ? '#ffe138' : '#333'}}>{shape.name}</div>
           </div>
         ))}
       </div>
       <button onClick={reset} style={{marginTop:20}}>Reset Colors</button>
+      
+      {/* Touch Control Buttons */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 12,
+        marginTop: 20,
+        padding: '0 20px'
+      }}>
+        <div style={{ color: '#666', fontSize: 14, marginBottom: 8 }}>
+          Touch Controls
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
+          <button
+            onTouchStart={prevColor}
+            onClick={prevColor}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Previous Color"
+          >
+            ⬅️
+          </button>
+          
+          <div style={{
+            width: 50,
+            height: 50,
+            background: color,
+            border: '3px solid #333',
+            borderRadius: 8,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            color: color === '#fff' ? '#000' : '#fff',
+            fontWeight: 'bold'
+          }}>
+            Color
+          </div>
+          
+          <button
+            onTouchStart={nextColor}
+            onClick={nextColor}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Next Color"
+          >
+            ➡️
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
+          <button
+            onTouchStart={prevShape}
+            onClick={prevShape}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Previous Shape"
+          >
+            ⬆️
+          </button>
+          
+          <button
+            onTouchStart={fillSelectedShape}
+            onClick={fillSelectedShape}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 20,
+              background: 'linear-gradient(135deg, #ffe138 0%, #f9c74f 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#222',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Fill Selected Shape"
+          >
+            🎨
+          </button>
+          
+          <button
+            onTouchStart={nextShape}
+            onClick={nextShape}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Next Shape"
+          >
+            ⬇️
+          </button>
+        </div>
+        
+        <div style={{ color: '#666', fontSize: 12, textAlign: 'center', maxWidth: 300 }}>
+          Use arrows to navigate colors/shapes, then tap 🎨 to fill
+        </div>
+      </div>
     </div>
   );
 }

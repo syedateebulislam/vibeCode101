@@ -122,6 +122,31 @@ export default function Snake({ onHome }) {
     setPaused(false);
   };
 
+  // Touch control functions
+  const moveUp = () => {
+    if (!running || paused || dirRef.current.y !== 1) {
+      if (dirRef.current.y !== 1) setDir({ x: 0, y: -1 });
+    }
+  };
+  
+  const moveDown = () => {
+    if (!running || paused || dirRef.current.y !== -1) {
+      if (dirRef.current.y !== -1) setDir({ x: 0, y: 1 });
+    }
+  };
+  
+  const moveLeft = () => {
+    if (!running || paused || dirRef.current.x !== 1) {
+      if (dirRef.current.x !== 1) setDir({ x: -1, y: 0 });
+    }
+  };
+  
+  const moveRight = () => {
+    if (!running || paused || dirRef.current.x !== -1) {
+      if (dirRef.current.x !== -1) setDir({ x: 1, y: 0 });
+    }
+  };
+
   return (
     <div style={{ textAlign: 'center', marginTop: 30 }}>
       {/* Home/Menu Button */}
@@ -150,11 +175,7 @@ export default function Snake({ onHome }) {
         }}
         title="Back to Home"
       >
-        <svg width="32" height="32" viewBox="0 0 24 24" style={{ display: 'block' }}>
-          <path d="M3 12L12 5l9 7" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <rect x="7" y="13" width="10" height="7" rx="2" fill="#222" stroke="#fff" strokeWidth="2.5" />
-          <path d="M9 21V16h6v5" fill="none" stroke="#fff" strokeWidth="2" />
-        </svg>
+        🏠
       </button>
       <h1>Snake Game</h1>
       <div style={{
@@ -253,6 +274,134 @@ export default function Snake({ onHome }) {
             ))}
           </tbody>
         </table>
+      </div>
+      
+      {/* Touch Control Buttons */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 20,
+        padding: '0 20px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onTouchStart={moveUp}
+            onClick={moveUp}
+            disabled={!running || paused}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (!running || paused) ? 0.5 : 1,
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Up"
+          >
+            ⬆️
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+          <button
+            onTouchStart={moveLeft}
+            onClick={moveLeft}
+            disabled={!running || paused}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (!running || paused) ? 0.5 : 1,
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Left"
+          >
+            ⬅️
+          </button>
+          
+          <button
+            onTouchStart={moveRight}
+            onClick={moveRight}
+            disabled={!running || paused}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #61dafb 0%, #21b7e6 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (!running || paused) ? 0.5 : 1,
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Right"
+          >
+            ➡️
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onTouchStart={moveDown}
+            onClick={moveDown}
+            disabled={!running || paused}
+            style={{
+              width: 50,
+              height: 50,
+              fontSize: 24,
+              background: 'linear-gradient(135deg, #8ac926 0%, #52b788 100%)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: (!running || paused) ? 0.5 : 1,
+              transition: 'all 0.1s',
+              userSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none'
+            }}
+            title="Move Down"
+          >
+            ⬇️
+          </button>
+        </div>
       </div>
     </div>
   );
