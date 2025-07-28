@@ -173,7 +173,7 @@ export default function Tetris({
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
         } else if (Math.abs(dy) > 30 && Math.abs(dy) > Math.abs(dx)) {
-          if (dy > 0) fastDrop();
+          if (dy > 0) setFastDropping(true);
           moved = true;
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;

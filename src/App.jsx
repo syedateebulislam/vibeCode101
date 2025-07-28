@@ -55,7 +55,9 @@ function App() {
           setTopScorer(best);
         }
         return;
-      } catch {}
+      } catch {
+        // Failed to parse localStorage data, will fetch from file instead
+      }
     }
     fetch('/scoreboard.xlsx')
       .then(res => res.arrayBuffer())
@@ -142,7 +144,7 @@ function App() {
     });
     setTimer(300);
   };
-  const handleScoreUpdate = (score) => {
+  const handleScoreUpdate = () => {
     // Optionally update live score elsewhere
   };
 
