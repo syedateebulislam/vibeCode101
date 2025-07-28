@@ -6,7 +6,7 @@ import Home from './Home';
 import Snake from './Snake';
 import MemoryMatch from './MemoryMatch';
 import ColoringBook from './ColoringBook';
-import { Analytics } from "@vercel/analytics/react"
+// import { Analytics } from "@vercel/analytics/react"
 
 // Random handle generator
 function randomHandle() {
@@ -155,7 +155,7 @@ function App() {
           onSelectMemory={() => { setShowMemory(true); setShowTetris(false); setShowSnake(false); setShowColoring(false); }}
           onSelectColoring={() => { setShowColoring(true); setShowTetris(false); setShowSnake(false); setShowMemory(false); }}
         />
-        <Analytics />
+{/* <Analytics /> */}
       </>
     );
   }
@@ -163,7 +163,7 @@ function App() {
     return (
       <>
         <Snake onHome={() => { setShowSnake(false); setShowTetris(false); setShowMemory(false); setShowColoring(false); }} />
-        <Analytics />
+{/* <Analytics /> */}
       </>
     );
   }
@@ -171,7 +171,7 @@ function App() {
     return (
       <>
         <MemoryMatch onHome={() => { setShowMemory(false); setShowTetris(false); setShowSnake(false); setShowColoring(false); }} />
-        <Analytics />
+{/* <Analytics /> */}
       </>
     );
   }
@@ -179,7 +179,7 @@ function App() {
     return (
       <>
         <ColoringBook onHome={() => { setShowColoring(false); setShowTetris(false); setShowSnake(false); setShowMemory(false); }} />
-        <Analytics />
+{/* <Analytics /> */}
       </>
     );
   }
